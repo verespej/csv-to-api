@@ -7,6 +7,10 @@ Converts spreadsheets to APIs
 ```sh
 > git clone https://github.com/verespej/csv-to-api
 > npm install
+> set AWS_KEY_ID={Your AWS Key ID}
+> set AWS_KEY={Your AWS Key}
+> set AWS_REGION={Your desired AWS region}
+> set S3_BUCKET={Your desired S3 bucket name}
 > npm start
 ```
 
