@@ -122,9 +122,15 @@ app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
 });
 
 app.get('/api/data/:id', function(req, res, next) {
+	// Don't allow ..
+	// TODO: Make this handle more nicely
+	if (req.params.id.includes('..')) {
+		throw new Error('Invalid ID');
+	}
+
 	var path = __dirname + '/tmp_store/' + req.params.id;
 	req.log.info({ id: req.params.id, path: path }, 'File request');
-	_fs.stat(path, function(err, stats) {
+	_fs.readFile(path, function(err, data) {
 		if (err) {
 			req.log.error(err);
 			if (err.code === 'ENOENT') {
@@ -134,7 +140,7 @@ app.get('/api/data/:id', function(req, res, next) {
 			}
 			next(err);
 		} else {
-			res.send('ok');
+			res.json(JSON.parse(data));
 			next();
 		}
 	});
