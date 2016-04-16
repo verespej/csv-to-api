@@ -3,6 +3,7 @@ var _bunyan = require('bunyan');
 var _uuid = require('uuid');
 var _express = require('express');
 var _body_parser = require('body-parser');
+var _s3 = require('./app_modules/s3');
 
 var _config = (function() {
 	var log_level = process.env.LOG_LEVEL;
@@ -17,8 +18,29 @@ var _config = (function() {
 		throw new Error('Log level must be one of the following string values: trace, debug, info, warn, error, fatal');
 	}
 
+	var aws_key_id = process.env.AWS_KEY_ID;
+	if (typeof(aws_key_id) !== 'string' || aws_key_id.length < 1) {
+		throw new Error('Must set a string value for AWS_KEY_ID');
+	}
+	var aws_key = process.env.AWS_KEY;
+	if (typeof(aws_key) !== 'string' || aws_key.length < 1) {
+		throw new Error('Must set a string value for AWS_KEY');
+	}
+	var aws_region = process.env.AWS_REGION;
+	if (typeof(aws_region) !== 'string' || aws_region.length < 1) {
+		throw new Error('Must set a string value for AWS_REGION');
+	}
+	var s3_bucket = process.env.S3_BUCKET;
+	if (typeof(s3_bucket) !== 'string' || s3_bucket.length < 1) {
+		throw new Error('Must set a string value for S3_BUCKET');
+	}
+
 	return {
-		log_level: log_level
+		log_level: log_level,
+		aws_key_id: aws_key_id,
+		aws_key: aws_key,
+		aws_region: aws_region,
+		s3_bucket: s3_bucket
 	};
 })();
 
@@ -68,7 +90,9 @@ app.use(_express.static(__dirname + '/static'));
 
 app.set('port', (process.env.PORT || 5000));
 
-_log.info('Starting server');
-app.listen(app.get('port'), function() {
+_s3.init(_log, _config.aws_key_id, _config.aws_key, _config.aws_region, _config.s3_bucket).then(function() {
+	_log.info('Starting server');
+	return _q.ninvoke(app, 'listen', app.get('port'));
+}).then(function() {
 	_log.info('Express server started on port ' + app.get('port'));
 });
