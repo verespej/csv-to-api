@@ -1,0 +1,28 @@
+{
+  "name": "csvtoapi",
+  "version": "0.0.1",
+  "description": "Converts spreadsheets to APIs",
+  "author": "Hakon Verespej <mrhakon@gmail.com>",
+  "license": "UNLICENSED",
+  "main": "./server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js | node node_modules/bunyan/bin/bunyan"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/verespej/csv-to-api"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.2.31",
+    "body-parser": "^1.14.2",
+    "bunyan": "^1.5.1",
+    "express": "^4.13.3",
+    "q": "^1.4.1",
+    "request": "^2.67.0",
+    "uuid": "^2.0.1"
+  },
+  "engines": {
+    "node": "4.2.2"
+  }
+}
