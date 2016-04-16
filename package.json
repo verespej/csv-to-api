@@ -10,14 +10,16 @@
     "start": "node server.js | node node_modules/bunyan/bin/bunyan"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/verespej/csv-to-api"
+    "type": "git",
+    "url": "https://github.com/verespej/csv-to-api"
   },
   "dependencies": {
     "aws-sdk": "^2.2.31",
     "body-parser": "^1.14.2",
     "bunyan": "^1.5.1",
-    "express": "^4.13.3",
+    "csvtojson": "^0.5.3",
+    "express": "^4.13.4",
+    "multer": "^1.1.0",
     "q": "^1.4.1",
     "request": "^2.67.0",
     "uuid": "^2.0.1"

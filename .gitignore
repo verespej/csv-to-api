@@ -4,4 +4,4 @@ logs/
 *.swp
 *~
 .DS_Store
-
+tmp_store/

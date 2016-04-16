@@ -1,8 +1,12 @@
 var _q = require('q');
 var _bunyan = require('bunyan');
 var _uuid = require('uuid');
+var _fs = require('fs');
 var _express = require('express');
 var _body_parser = require('body-parser');
+var _multer = require('multer');
+var _upload = _multer({ dest: 'tmp_store/' });
+var _csv_to_json = require('csvtojson').Converter;
 var _s3 = require('./app_modules/s3');
 
 var _config = (function() {
@@ -63,8 +67,8 @@ var _log = new _bunyan({
 });
 
 var app = _express();
-app.use(_body_parser.json());
-app.use(_body_parser.urlencoded({ extended: true }));
+//app.use(_body_parser.json());
+//app.use(_body_parser.urlencoded({ extended: true }));
 app.use(function(req, res, next) {
 	req.id = _uuid.v4();
 	req.log = _log.child({ req_id: req.id });
@@ -87,6 +91,33 @@ app.use(function(req, res, next) {
 	next();
 });
 app.use(_express.static(__dirname + '/static'));
+
+app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
+	req.log.info('File uploaded to ' + req.file.path);
+	//var csv_converter = new Converter({});
+	res.json({ url: '/api/data/' + req.file.filename });
+	//_fs.unlinkSync(req.file.path);
+	next();
+});
+
+app.get('/api/data/:id', function(req, res, next) {
+	var path = __dirname + '/tmp_store/' + req.params.id;
+	req.log.info({ id: req.params.id, path: path }, 'File request');
+	_fs.stat(path, function(err, stats) {
+		if (err) {
+			req.log.error(err);
+			if (err.code === 'ENOENT') {
+				res.status(404).send('Not found');
+			} else {
+				res.status(500).send('Internal error');
+			}
+			next(err);
+		} else {
+			res.send('ok');
+			next();
+		}
+	});
+});
 
 app.set('port', (process.env.PORT || 5000));
 
