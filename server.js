@@ -93,11 +93,32 @@ app.use(function(req, res, next) {
 app.use(_express.static(__dirname + '/static'));
 
 app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
-	req.log.info('File uploaded to ' + req.file.path);
-	//var csv_converter = new Converter({});
-	res.json({ url: '/api/data/' + req.file.filename });
-	//_fs.unlinkSync(req.file.path);
-	next();
+	var dest = req.file.path + '.json';
+
+	var csv_converter = new _csv_to_json();
+	csv_converter.on('end_parsed', function (json) {
+		req.log.info({ dest: dest }, 'Writing file');
+		_fs.writeFile(dest, JSON.stringify(json), function(err) {
+			if (err) {
+				req.log.error(err);
+				res.status(500).send('Internal error');
+				next(err);
+			} else {
+				req.log.info({ dest: dest }, 'Successfully wrote file')
+				res.json({ url: '/api/data/' + req.file.filename + '.json' });
+				//_fs.unlinkSync(req.file.path);
+				next();
+			}
+		});
+	});
+	csv_converter.on('error', function(msg, data) {
+		req.log.error({ err_msg: msg, err_data: data });
+		res.status(500).send('Internal error');
+		next(msg);
+	});
+
+	req.log.info('Converting csv to json');
+	_fs.createReadStream(req.file.path).pipe(csv_converter);
 });
 
 app.get('/api/data/:id', function(req, res, next) {
