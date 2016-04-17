@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Shapes and Symbols</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/css/esri.css">
+
+    <style>
+      #info {
+        top: 20px;
+        color: #444;
+        height: auto;
+        font-family: arial;
+        right: 20px;
+        margin: 5px;
+        padding: 10px;
+        position: absolute;
+        width: 115px;
+        z-index: 40;
+        border: solid 2px #666;
+        border-radius: 4px;
+        background-color: #fff;
+      }
+      html, body, #mapDiv {
+        padding:0;
+        margin:0;
+        height:100%;
+      }
+      button {
+        display: block;
+      }
+    </style>
+
+    <script src="https://js.arcgis.com/3.16/"></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
+
+    <script>
+      var map;
+
+      require(["esri/map", "esri/symbols/SimpleMarkerSymbol","esri/graphic","esri/geometry/Point","esri/Color",
+        "dojo/domReady!"], function(Map, SimpleMarkerSymbol,Graphic, Point, Color) {
+        map = new Map("mapDiv", {
+          basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+          center: [-122.3321,47.6062], // longitude, latitude
+          zoom: 14
+        });
+        console.log("loading map");
+        map.on("load", DownloadJsonFromS3);
+
+        function ShowLocation(Longitude, Latitude){
+            var point = new Point(Longitude, Latitude);
+
+            var markerSymbol = new SimpleMarkerSymbol();
+            markerSymbol.setPath("M16,4.938c-7.732,0-14,4.701-14,10.5c0,1.981,0.741,3.833,2.016,5.414L2,25.272l5.613-1.44c2.339,1.316,5.237,2.106,8.387,2.106c7.732,0,14-4.701,14-10.5S23.732,4.938,16,4.938zM16.868,21.375h-1.969v-1.889h1.969V21.375zM16.772,18.094h-1.777l-0.176-8.083h2.113L16.772,18.094z");
+            markerSymbol.setColor(new Color("#00FFFF"));  
+
+            var graphic = new Graphic(point, markerSymbol);
+            map.graphics.add(graphic);
+        }
+
+        function DownloadJsonFromS3(){
+          $.getJSON( "https://s3-us-west-2.amazonaws.com/csv2json/fae526022cf77def094d2a63c2f448ee", function( data ) {
+            $.each( data, function( key, val ) {
+              ShowLocation(val.Longitude, val.Latitude);
+              return;
+            });
+          });
+        }
+      });
+
+    </script>
+  </head>
+  
+  <body>
+    <div id="mapDiv"></div>
+  </body>
+</html>
