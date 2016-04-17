@@ -95,12 +95,20 @@ app.use(_express.static(__dirname + '/static'));
 app.use(cors());
 
 app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
+	var expiration_in_seconds = 120;
+
 	convert_csv_to_json(req.log, req.file.path).then(function(json_obj) {
 		return _s3.upsert(req.log, req.file.filename, json_obj);
 	}).then(function() {
 		return _q.ninvoke(_fs, 'unlink', req.file.path);
-	}).done(function() {
-		res.json({ url: '/api/data/' + req.file.filename });
+	}).then(function() {
+		return _s3.create_temp_access(req.log, req.file.filename, expiration_in_seconds);
+	}).done(function(s3_url) {
+		res.json({
+			url: '/api/data/' + req.file.filename,
+			s3_url: s3_url,
+			s3_url_expiration: expiration_in_seconds
+		});
 		next();
 	}, function(err) {
 		req.log.error({ err: err });

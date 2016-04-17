@@ -177,10 +177,32 @@ function list(log, prefix, max_count) {
 	});
 }
 
+function create_temp_access(log, key, expiration_in_seconds) {
+	if (typeof(key) !== 'string' || key === null || key.length < 1) {
+		return _q.reject(new Error('Must provide a string value for parameter "key"'));
+	}
+	if (typeof(expiration_in_seconds) !== 'number' || expiration_in_seconds < 0) {
+		return _q.reject(new Error('Must provide a non-negative number for parameter "expiration_in_seconds"'));
+	}
+
+	var options = {
+		Bucket: _config.s3_bucket,
+		Key: key,
+		ResponseContentEncoding: 'utf-8',
+		ResponseContentType: 'application/json',
+		Expires: expiration_in_seconds
+	};
+	log.debug({ options: options }, 'Creating temp access to s3 object');
+	return get_s3_connection(_aws).then(function(s3) {
+		return _q.ninvoke(s3, 'getSignedUrl', 'getObject', options);
+	});
+}
+
 module.exports = {
 	init: init,
 	upsert: upsert,
 	retrieve: retrieve,
 	remove: remove,
-	list: list
+	list: list,
+	create_temp_access: create_temp_access
 };
