@@ -107,7 +107,9 @@ app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
 		return _s3.create_temp_access(req.log, req.file.filename, expiration_in_seconds);
 	}).done(function(s3_url) {
 		UpdateWebEndpoint(s3_url);
-		next();
+		res.status(200).send({
+			result: s3_url
+		});
 	}, function(err) {
 		req.log.error({ err: err });
 		res.status(500).send('Internal error');
