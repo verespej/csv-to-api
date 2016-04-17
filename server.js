@@ -8,6 +8,7 @@ var _multer = require('multer');
 var _upload = _multer({ dest: 'tmp_store/' });
 var _csv_to_json = require('csvtojson').Converter;
 var _s3 = require('./app_modules/s3');
+var cors = require('cors')
 
 var _config = (function() {
 	var log_level = process.env.LOG_LEVEL;
@@ -92,6 +93,9 @@ app.use(function(req, res, next) {
 });
 app.use(_express.static(__dirname + '/static'));
 
+// TODO allow all CORS, we can lock this down later
+app.use(cors());
+
 app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
 	var dest = req.file.path + '.json';
 
@@ -153,4 +157,6 @@ _s3.init(_log, _config.aws_key_id, _config.aws_key, _config.aws_region, _config.
 	return _q.ninvoke(app, 'listen', app.get('port'));
 }).then(function() {
 	_log.info('Express server started on port ' + app.get('port'));
+}).catch(function(err) {
+	_log.error('Something horrible happened', err);
 });

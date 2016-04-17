@@ -17,6 +17,7 @@
     "aws-sdk": "^2.2.31",
     "body-parser": "^1.14.2",
     "bunyan": "^1.5.1",
+    "cors": "^2.7.1",
     "csvtojson": "^0.5.3",
     "express": "^4.13.4",
     "multer": "^1.1.0",
@@ -26,5 +27,11 @@
   },
   "engines": {
     "node": "4.2.2"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-env": "^0.4.4",
+    "grunt-nodemon": "^0.4.2"
   }
 }
