@@ -37,9 +37,11 @@
 
     <script src="https://js.arcgis.com/3.16/"></script>
     <script src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
+    <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
 
     <script>
       var map;
+      var fireBase;
 
       require(["esri/map", "esri/symbols/SimpleMarkerSymbol","esri/graphic","esri/geometry/Point","esri/Color",
         "dojo/domReady!"], function(Map, SimpleMarkerSymbol,Graphic, Point, Color) {
@@ -49,7 +51,7 @@
           zoom: 14
         });
         console.log("loading map");
-        map.on("load", DownloadJsonFromS3);
+        map.on("load", InitFirebase);
 
         function ShowLocation(Longitude, Latitude){
             var point = new Point(Longitude, Latitude);
@@ -62,12 +64,23 @@
             map.graphics.add(graphic);
         }
 
-        function DownloadJsonFromS3(){
-          $.getJSON( "https://s3-us-west-2.amazonaws.com/csv2json/fae526022cf77def094d2a63c2f448ee", function( data ) {
+        function DownloadJsonFromS3(url){
+          //https://s3-us-west-2.amazonaws.com/csv2json/fae526022cf77def094d2a63c2f448ee
+          $.getJSON( url, function( data ) {
             $.each( data, function( key, val ) {
               ShowLocation(val.Longitude, val.Latitude);
               return;
             });
+          });
+        }
+
+        function InitFirebase(){
+          firebase = new Firebase('https://sweltering-heat-3570.firebaseio.com/csv2json/post');
+          firebase.on('child_changed', function(snap){
+            console.log("initial data loaded!", JSON.stringify(snap.val()));
+            if(snap.key() == "jsonUrl"){
+              DownloadJsonFromS3(snap.val());
+            }
           });
         }
       });
