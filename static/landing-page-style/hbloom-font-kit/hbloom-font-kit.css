@@ -1,0 +1,47 @@
+/* @license
+ * MyFonts Webfont Build ID 2437644, 2012-12-26T15:11:42-0500
+ * 
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are 
+ * explicitly restricted from using the Licensed Webfonts(s).
+ * 
+ * You may obtain a valid license at the URLs below.
+ * 
+ * Webfont: Futura PT Bold by ParaType
+ * URL: http://www.myfonts.com/fonts/paratype/futura-book/bold/
+ * Copyright: Copyright (c) 1990-2008 ParaType, Inc. All Rights Reserved.
+ * 
+ * Webfont: Futura PT Book by ParaType
+ * URL: http://www.myfonts.com/fonts/paratype/futura-book/futura-book/
+ * Copyright: Copyright (c) 1990-2008 ParaType, Inc. All Rights Reserved.
+ * 
+ * Webfont: ITC Caslon 224 Book by ITC
+ * URL: http://www.myfonts.com/fonts/itc/caslon-no-224/caslon-two-twe-four/
+ * Copyright: Copyright 1990, 2001 Adobe Systems Incorporated. All Rights Reserved.
+ * 
+ * Webfont: ITC Caslon 224 Bold by ITC
+ * URL: http://www.myfonts.com/fonts/itc/caslon-no-224/caslon-two-twe-four-bold/
+ * Copyright: Copyright 1990, 2001 Adobe Systems Incorporated. All Rights Reserved.
+ * 
+ * 
+ * License: http://www.myfonts.com/viewlicense?type=web&buildid=2437644
+ * 
+ * Â© 2012 Bitstream Inc
+*/
+
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/25320c");
+
+  
+@font-face {font-family: 'FuturaPTBold-Reg';src: url('webfonts/25320C_0_0.eot');src: url('webfonts/25320C_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/25320C_0_0.woff') format('woff'),url('webfonts/25320C_0_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'FuturaPTBook-Reg';src: url('webfonts/25320C_1_0.eot');src: url('webfonts/25320C_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/25320C_1_0.woff') format('woff'),url('webfonts/25320C_1_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'CaslonTwoTwentyFour-Book';src: url('webfonts/25320C_2_0.eot');src: url('webfonts/25320C_2_0.eot?#iefix') format('embedded-opentype'),url('webfonts/25320C_2_0.woff') format('woff'),url('webfonts/25320C_2_0.ttf') format('truetype');}
+ 
+@font-face {font-family: 'CaslonTwoTwentyFour-Book-Italic';src: url('webfonts/29476C_0_0.eot');src: url('webfonts/29476C_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/29476C_0_0.woff') format('woff'),url('webfonts/29476C_0_0.ttf') format('truetype');}
+  
+@font-face {font-family: 'CaslonTwoTwentyFour-Bold';src: url('webfonts/25320C_3_0.eot');src: url('webfonts/25320C_3_0.eot?#iefix') format('embedded-opentype'),url('webfonts/25320C_3_0.woff') format('woff'),url('webfonts/25320C_3_0.ttf') format('truetype');}

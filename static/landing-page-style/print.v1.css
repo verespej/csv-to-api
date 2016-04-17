@@ -1,0 +1,40 @@
+#wrap {
+  margin:0;
+}
+#push {
+  display:none;
+}
+#featurebar li {
+  border:0;
+  width:225px !important;
+}
+#footer li {
+  border:0 !important;
+  width:208px !important;
+}
+#footer #seen {
+  width:230px !important;
+}
+#footer #seen #logos a,
+#footer #social .share, #footer #social .facebook, #footer #social .twitter {
+  clear:both;
+  display:block !important;
+  height:auto;
+  opacity:1 !important;
+  position:relative;
+  text-indent:0;
+  width:auto !important;
+}
+/**page specific**/
+#step2-form .radio label {
+  float:left;
+  height:auto !important;
+  text-indent:0;
+  width:auto !important;
+}
+#step2-form .radio input {
+  display:block !important;
+  float:left;
+  margin:2px 30px 0 5px;
+  width:auto !important;
+}
