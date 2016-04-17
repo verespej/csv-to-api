@@ -97,7 +97,7 @@ app.use(_express.static(__dirname + '/static'));
 app.use(cors());
 
 app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
-	var expiration_in_seconds = 120;
+	var expiration_in_seconds = 12000;
 
 	convert_csv_to_json(req.log, req.file.path).then(function(json_obj) {
 		return _s3.upsert(req.log, req.file.filename, json_obj);
@@ -119,9 +119,9 @@ function UpdateWebEndpoint(url){
 	// call the firebase
 	var notificationEndpointurl = "https://sweltering-heat-3570.firebaseio.com/csv2json/post.json";
 	console.log("making request");
-	_request({ url: notificationEndpointurl, method: 'PUT', json: {jsonUrl: URL}}, function(err, response){
+	_request({ url: notificationEndpointurl, method: 'PUT', json: {jsonUrl: url}}, function(err, response){
 		console.log(response.statusCode);
-	})
+	});
 }
 
 function convert_csv_to_json(log, csv_file) {
