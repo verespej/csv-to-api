@@ -8,7 +8,9 @@ var _multer = require('multer');
 var _upload = _multer({ dest: 'tmp_store/' });
 var _csv_to_json = require('csvtojson').Converter;
 var _s3 = require('./app_modules/s3');
-var cors = require('cors')
+var cors = require('cors');
+var _request = require('request');
+
 
 var _config = (function() {
 	var log_level = process.env.LOG_LEVEL;
@@ -104,11 +106,7 @@ app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
 	}).then(function() {
 		return _s3.create_temp_access(req.log, req.file.filename, expiration_in_seconds);
 	}).done(function(s3_url) {
-		res.json({
-			url: '/api/data/' + req.file.filename,
-			s3_url: s3_url,
-			s3_url_expiration: expiration_in_seconds
-		});
+		UpdateWebEndpoint(s3_url);
 		next();
 	}, function(err) {
 		req.log.error({ err: err });
@@ -116,6 +114,15 @@ app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
 		next(err);
 	});
 });
+
+function UpdateWebEndpoint(url){
+	// call the firebase
+	var notificationEndpointurl = "https://sweltering-heat-3570.firebaseio.com/csv2json/post.json";
+	console.log("making request");
+	_request({ url: notificationEndpointurl, method: 'PUT', json: {jsonUrl: URL}}, function(err, response){
+		console.log(response.statusCode);
+	})
+}
 
 function convert_csv_to_json(log, csv_file) {
 	var d = _q.defer();
