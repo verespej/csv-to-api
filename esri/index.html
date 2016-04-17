@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/css/esri.css">
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style>
       #info {
         top: 20px;
@@ -38,9 +39,11 @@
     <script src="https://js.arcgis.com/3.16/"></script>
     <script src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
     <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
-
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    
     <script>
       var map;
+      var organizedData = {};
       var fireBase;
 
       require(["esri/map", "esri/symbols/SimpleMarkerSymbol","esri/graphic","esri/geometry/Point","esri/Color",
@@ -50,6 +53,7 @@
           center: [-122.3321,47.6062], // longitude, latitude
           zoom: 14
         });
+
         console.log("loading map");
         map.on("load", InitFirebase);
 
@@ -68,9 +72,11 @@
           //https://s3-us-west-2.amazonaws.com/csv2json/fae526022cf77def094d2a63c2f448ee
           $.getJSON( url, function( data ) {
             $.each( data, function( key, val ) {
-              ShowLocation(val.Longitude, val.Latitude);
+              OrganizeData(val);
               return;
             });
+            CreateButtons();  
+                      
           });
         }
 
@@ -83,12 +89,47 @@
             }
           });
         }
+
+        function CreateButtons(){
+          $.each(organizedData, function(year, contents){
+            $('#yearButtons').append('<li><input class="btn btn-primary" type="button" value="' + year + '"</input></li>')
+          });
+
+          $("input").click(function(e){
+            var yearIncidents = organizedData[e.target.value];
+            map.graphics.clear();
+            $.each(yearIncidents, function(idx, contents){
+              ShowLocation(contents.Longitude, contents.Latitude);
+          });
+        });    
+        }
+
+        function OrganizeData(data){
+          if(data == undefined || data["Event Clearance Date"] == undefined){
+            return;
+          }
+
+          var yearOfoccurance = new Date(Date.parse(data["Event Clearance Date"])).getFullYear();
+
+          if(isNaN(yearOfoccurance)){
+            return;
+          }
+
+          if(organizedData[yearOfoccurance] == undefined){
+            organizedData[yearOfoccurance] = [];
+          }
+
+          organizedData[yearOfoccurance].push(data);
+        }        
       });
 
     </script>
   </head>
   
   <body>
-    <div id="mapDiv"></div>
+    <div id="mapDiv">
+      <ul id="yearButtons" style="position:absolute;list-style-type: none;z-index: 1000;top: 100px;left: 100px; bottom:25px">
+      </ul>
+    </div>
   </body>
 </html>
