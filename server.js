@@ -68,8 +68,6 @@ var _log = new _bunyan({
 });
 
 var app = _express();
-//app.use(_body_parser.json());
-//app.use(_body_parser.urlencoded({ extended: true }));
 app.use(function(req, res, next) {
 	req.id = _uuid.v4();
 	req.log = _log.child({ req_id: req.id });
@@ -97,56 +95,57 @@ app.use(_express.static(__dirname + '/static'));
 app.use(cors());
 
 app.post('/api/data', _upload.single('datafile'), function(req, res, next) {
-	var dest = req.file.path + '.json';
-
-	var csv_converter = new _csv_to_json();
-	csv_converter.on('end_parsed', function (json) {
-		req.log.info({ dest: dest }, 'Writing file');
-		_fs.writeFile(dest, JSON.stringify(json), function(err) {
-			if (err) {
-				req.log.error(err);
-				res.status(500).send('Internal error');
-				next(err);
-			} else {
-				req.log.info({ dest: dest }, 'Successfully wrote file')
-				res.json({ url: '/api/data/' + req.file.filename + '.json' });
-				//_fs.unlinkSync(req.file.path);
-				next();
-			}
-		});
-	});
-	csv_converter.on('error', function(msg, data) {
-		req.log.error({ err_msg: msg, err_data: data });
+	convert_csv_to_json(req.log, req.file.path).then(function(json_obj) {
+		return _s3.upsert(req.log, req.file.filename, json_obj);
+	}).then(function() {
+		return _q.ninvoke(_fs, 'unlink', req.file.path);
+	}).done(function() {
+		res.json({ url: '/api/data/' + req.file.filename });
+		next();
+	}, function(err) {
+		req.log.error({ err: err });
 		res.status(500).send('Internal error');
-		next(msg);
+		next(err);
 	});
-
-	req.log.info('Converting csv to json');
-	_fs.createReadStream(req.file.path).pipe(csv_converter);
 });
 
+function convert_csv_to_json(log, csv_file) {
+	var d = _q.defer();
+
+	var csv_converter = new _csv_to_json();
+
+	csv_converter.on('end_parsed', function (json_obj) {
+		d.resolve(json_obj);
+	});
+
+	csv_converter.on('error', function(err_msg, err_data) {
+		log.error({ err_msg: err_msg, err_data: err_data }, 'Error converting CSV to JSON');
+		d.reject(new Error(err_msg));
+	});
+
+	_fs.createReadStream(csv_file).pipe(csv_converter);
+
+	return d.promise;
+}
+
 app.get('/api/data/:id', function(req, res, next) {
-	// Don't allow ..
-	// TODO: Make this handle more nicely
-	if (req.params.id.includes('..')) {
-		throw new Error('Invalid ID');
+	if (!/^[a-z0-9]+$/.test(req.params.id)) {
+		res.status(400).send('Invalid ID');
+		next(new Error('Invalid ID'));
+		return;
 	}
 
-	var path = __dirname + '/tmp_store/' + req.params.id;
-	req.log.info({ id: req.params.id, path: path }, 'File request');
-	_fs.readFile(path, function(err, data) {
-		if (err) {
-			req.log.error(err);
-			if (err.code === 'ENOENT') {
-				res.status(404).send('Not found');
-			} else {
-				res.status(500).send('Internal error');
-			}
-			next(err);
+	_s3.retrieve(req.log, req.params.id).done(function(json_obj) {
+		res.json(json_obj);
+		next();
+	}, function(err) {
+		req.log.error(err);
+		if (err.code === 'NoSuchKey') {
+			res.status(404).send('Not found');
 		} else {
-			res.json(JSON.parse(data));
-			next();
+			res.status(500).send('Internal error');
 		}
+		next(err);
 	});
 });
 
