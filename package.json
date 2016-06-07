@@ -14,7 +14,7 @@
     "url": "https://github.com/verespej/csv-to-api"
   },
   "dependencies": {
-    "aws-sdk": "^2.2.31",
+    "aws-sdk": "^2.3.17",
     "body-parser": "^1.14.2",
     "bunyan": "^1.5.1",
     "cors": "^2.7.1",
